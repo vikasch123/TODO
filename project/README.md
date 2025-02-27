@@ -105,4 +105,4 @@ This workflow runs when changes are made to migration files:
 
 ## License
 
-MIT
+MIT.
