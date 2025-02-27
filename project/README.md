@@ -88,6 +88,7 @@ This workflow runs on every push to the main branch and on pull requests:
 5. Builds the application
 6. Deploys to Netlify (only on pushes to main)
 
+
 ### Supabase Migration Workflow (`supabase-migration.yml`)
 
 This workflow runs when changes are made to migration files:
@@ -105,4 +106,4 @@ This workflow runs when changes are made to migration files:
 
 ## License
 
-MIT.
+MIT..
