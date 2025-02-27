@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    
+    tools {
+        nodejs 'node'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+        
+        stage('Lint') {
+            steps {
+                sh 'npm run lint'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+        
+        stage('Deploy to Netlify') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'npm install -g netlify-cli'
+                sh 'netlify deploy --dir=dist --prod'
+            }
+            environment {
+                NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
+                NETLIFY_SITE_ID = credentials('netlify-site-id')
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build or deployment failed!'
+        }
+    }
+}

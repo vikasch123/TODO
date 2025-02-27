@@ -1,0 +1,66 @@
+stages:
+  - install
+  - lint
+  - build
+  - test
+  - deploy
+
+variables:
+  NODE_VERSION: "18"
+
+# Cache dependencies between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+install:
+  stage: install
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+
+lint:
+  stage: lint
+  image: node:${NODE_VERSION}
+  script:
+    - npm run lint
+  dependencies:
+    - install
+
+build:
+  stage: build
+  image: node:${NODE_VERSION}
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+  dependencies:
+    - install
+
+# Placeholder for future test implementation
+# test:
+#   stage: test
+#   image: node:${NODE_VERSION}
+#   script:
+#     - npm test
+#   dependencies:
+#     - install
+
+deploy:
+  stage: deploy
+  image: node:${NODE_VERSION}
+  script:
+    - npm install -g netlify-cli
+    - netlify deploy --dir=dist --prod
+  dependencies:
+    - build
+  only:
+    - main
+  environment:
+    name: production
+    url: https://your-netlify-app-url.netlify.app
