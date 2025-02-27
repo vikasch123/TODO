@@ -12,7 +12,7 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4  # Updated to latest version
       
     - name: Setup Supabase CLI
       uses: supabase/setup-cli@v1
@@ -21,7 +21,10 @@ jobs:
         
     - name: Apply migrations to Supabase
       run: |
-        supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+        echo "🔗 Linking to Supabase Project..."
+        supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        
+        echo "🚀 Applying database migrations..."
         supabase db push
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
