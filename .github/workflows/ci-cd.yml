@@ -19,26 +19,30 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        
+        cache-dependency-path: project/package-lock.json # Set correct path for caching
+
     - name: Install dependencies
       run: |
-        if [ -f package-lock.json ]; then
+        if [ -f project/package-lock.json ]; then
           npm ci
         else
           npm install --no-audit --no-fund
         fi
+      working-directory: project  # Ensure npm runs in the correct directory
 
     - name: Lint code
       run: npm run lint
+      working-directory: project  # Ensure linting runs inside the correct directory
       
     - name: Build application
       run: npm run build
+      working-directory: project  # Ensure build runs inside the correct directory
       
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build-files
-        path: dist/
+        path: project/dist/  # Ensure the correct path is used
         
   deploy:
     needs: build-and-test
@@ -53,14 +57,13 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: build-files
-        path: dist
+        path: project/dist  # Ensure the downloaded path matches the correct build directory
         
     - name: Install Netlify CLI
       run: npm install -g netlify-cli
 
     - name: Deploy to Netlify
-      run: netlify deploy --dir=dist --prod
+      run: netlify deploy --dir=project/dist --prod  # Use correct path for deployment
       env:
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-
